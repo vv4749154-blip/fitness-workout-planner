@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fitness Workout Planner</title>
+  <style>
+    :root{
+      --bg:#0b1220; --card:#0f1724; --accent:#06b6d4; --muted:#9aa9b8;
+      --glass: rgba(255,255,255,0.03); --success:#10b981; --danger:#ef4444;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:
+      linear-gradient(180deg,#071024 0%, #0b1220 70%);color:#e6eef6;-webkit-font-smoothing:antialiased}
+    .wrap{max-width:1100px;margin:28px auto;padding:18px}
+    header{display:flex;gap:12px;align-items:center;margin-bottom:18px}
+    .logo{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#7c3aed);
+      display:grid;place-items:center;font-weight:700;color:#021024}
+    h1{margin:0;font-size:20px}
+    .lead{margin:0;color:var(--muted);font-size:13px}
+    .layout{display:grid;grid-template-columns:340px 1fr;gap:18px}
+    @media(max-width:920px){.layout{grid-template-columns:1fr}}
+    .card{background:linear-gradient(180deg,var(--card), rgba(255,255,255,0.02));
+      border-radius:12px;padding:14px;box-shadow:0 8px 30px rgba(2,8,23,0.6)}
+    label{display:block;color:var(--muted);font-size:13px;margin-bottom:6px}
+    input,select,textarea,button{font:inherit}
+    input[type="text"], input[type="number"], select, textarea{
+      width:100%;padding:9px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);
+      background:transparent;color:inherit;font-size:14px;outline:none
+    }
+    textarea{min-height:70px;resize:vertical}
+    .row{display:flex;gap:8px}
+    .btn{background:var(--accent);color:#021024;border:0;padding:9px 12px;border-radius:9px;cursor:pointer;font-weight:700}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);font-weight:600}
+    .btn.danger{background:var(--danger);color:#fff}
+    .muted{color:var(--muted);font-size:13px}
+    .library{margin-top:12px;display:flex;flex-direction:column;gap:10px;max-height:420px;overflow:auto;padding-right:6px}
+    .item{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:8px;
+      background:var(--glass);border:1px solid rgba(255,255,255,0.02);gap:8px}
+    .item .left{display:flex;gap:10px;align-items:center}
+    .avatar{width:44px;height:44px;border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);
+      display:grid;place-items:center;font-weight:700}
+    .tag{font-size:12px;color:var(--muted)}
+    .tiny{font-size:12px;color:var(--muted)}
+    .planner-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px}
+    .week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+    @media(max-width:920px){.week-grid{grid-template-columns:repeat(2,1fr)}}
+    .day{min-height:120px;padding:10px;border-radius:10px;background:
+      linear-gradient(180deg, rgba(255,255,255,0.012), transparent);border:1px solid rgba(255,255,255,0.03);
+      display:flex;flex-direction:column;gap:8px}
+    .day h3{margin:0;font-size:13px;display:flex;justify-content:space-between;align-items:center}
+    .items{display:flex;flex-direction:column;gap:8px;overflow:auto}
+    .plan{padding:8px;border-radius:8px;background:rgba(255,255,255,0.02);display:flex;justify-content:space-between;align-items:center}
+    .controls{display:flex;gap:8px;align-items:center}
+    footer{margin-top:12px;color:var(--muted);font-size:13px}
+    input.search{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+    .kbd{background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:6px;font-weight:700}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">FP</div>
+      <div>
+        <h1>Fitness Workout Planner</h1>
+        <p class="lead">Create workouts, plan the week, drag & drop — saved to your browser.</p>
+      </div>
+      <div style="flex:1"></div>
+      <input id="search" class="search" placeholder="Search library..." />
+    </header>
+
+    <main class="layout">
+      <!-- Sidebar / Library -->
+      <aside class="card">
+        <h3 style="margin:0 0 10px 0">Create Workout</h3>
+        <form id="form" autocomplete="off">
+          <label for="name">Name</label>
+          <input id="name" type="text" placeholder="Full Body Blast" required />
+          <div class="row" style="margin-top:8px">
+            <div style="flex:1">
+              <label for="minutes">Minutes</label>
+              <input id="minutes" type="number" min="1" placeholder="30" />
+            </div>
+            <div style="width:120px">
+              <label for="cat">Category</label>
+              <select id="cat">
+                <option>Strength</option><option>Cardio</option><option>HIIT</option><option>Yoga</option><option>Mobility</option>
+              </select>
+            </div>
+          </div>
+
+          <label for="exs" style="margin-top:8px">Exercises (one per line)</label>
+          <textarea id="exs" placeholder="Push-ups | 3x10&#10;Squats | 3x12"></textarea>
+
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button class="btn" type="submit">Add</button>
+            <button id="clearLib" type="button" class="btn ghost">Clear Library</button>
+            <button id="exportBtn" type="button" class="btn ghost">Export</button>
+            <input id="file" type="file" accept="application/json" style="display:none" />
+            <button id="importBtn" type="button" class="btn ghost">Import</button>
+          </div>
+        </form>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+          <div class="muted">Workout Library</div>
+          <div class="tiny">Drag into a day</div>
+        </div>
+
+        <div id="library" class="library" aria-live="polite"></div>
+
+        <footer><div class="tiny">Stored locally (LocalStorage)</div></footer>
+      </aside>
+
+      <!-- Planner -->
+      <section class="card">
+        <div class="planner-head">
+          <div>
+            <h2 style="margin:0">Weekly Planner</h2>
+            <div class="tiny muted">Click an empty day to quick-add</div>
+          </div>
+          <div class="controls">
+            <button id="prev" class="btn ghost">Prev</button>
+            <div class="kbd" id="weekLabel">—</div>
+            <button id="next" class="btn ghost">Next</button>
+            <button id="clearWeek" class="btn ghost">Clear Week</button>
+          </div>
+        </div>
+
+        <div id="weekGrid" class="week-grid" aria-label="Week planner"></div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+          <div class="tiny">Total planned minutes: <strong id="total">0</strong></div>
+          <div style="display:flex;gap:8px">
+            <button id="reset" class="btn danger">Reset All</button>
+            <button id="timer" class="btn ghost">Timer</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    /* Minimal, fully functional single-file planner with localStorage, drag-drop, export/import */
+    const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const KEY='fwplanner:v1';
+    let library = [], plan = {}, weekStart = startOfWeek(new Date());
+
+    const libraryEl = document.getElementById('library');
+    const weekGrid = document.getElementById('weekGrid');
+    const weekLabel = document.getElementById('weekLabel');
+    const totalEl = document.getElementById('total');
+
+    // load
+    function load(){ try{
+      const raw = localStorage.getItem(KEY);
+      if(raw){ const obj = JSON.parse(raw); library = obj.library||[]; plan = obj.plan||{}; if(obj.weekStart) weekStart=new Date(obj.weekStart); }
+      else { library = [
+        make('Full Body','Strength',30,['Push-ups | 3x10','Squats | 3x12','Plank | 45s']),
+        make('HIIT 20','HIIT',20,['Sprint 30s x8','Burpees 3x10']),
+        make('Morning Yoga','Yoga',25,['Sun Salute','Hip Openers'])
+      ]; plan={}; }
+    }catch(e){library=[];plan={}}}
+    function save(){ localStorage.setItem(KEY, JSON.stringify({library,plan,weekStart:weekStart.toISOString()})) }
+
+    function make(name,cat,mins,exs){ return {id:'w_'+Math.random().toString(36).slice(2,9),name,category:cat,duration:parseInt(mins)||0,exercises:exs||[]} }
+
+    // render library
+    function renderLib(filter=''){
+      libraryEl.innerHTML='';
+      const list = library.filter(w=> (w.name+' '+w.category+' '+w.exercises.join(' ')).toLowerCase().includes(filter.toLowerCase()));
+      if(!list.length){ libraryEl.innerHTML='<div class="tiny muted">No workouts</div>'; return; }
+      list.forEach(w=>{
+        const div=document.createElement('div'); div.className='item'; div.draggable=true; div.dataset.id=w.id;
+        div.innerHTML=`<div class="left"><div class="avatar">${(w.name.split(' ').slice(0,2).map(x=>x[0]||'').join('')).toUpperCase()}</div>
+          <div><div style="font-weight:700">${escapeHtml(w.name)}</div><div class="tag">${w.category} · ${w.duration} min</div></div></div>
+          <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+            <div style="display:flex;gap:6px"><button data-id="${w.id}" class="btn ghost small view">View</button><button data-id="${w.id}" class="btn ghost small del">Delete</button></div>
+          </div>`;
+        libraryEl.appendChild(div);
+        div.addEventListener('dragstart',e=>{ e.dataTransfer.setData('text/plain',w.id); e.dataTransfer.effectAllowed='copy' });
+      });
+
+      // attach view/delete
+      libraryEl.querySelectorAll('.view').forEach(b=>b.addEventListener('click',ev=>{
+        const w=library.find(x=>x.id===b.dataset.id); if(w) alert(format(w));
+      }));
+      libraryEl.querySelectorAll('.del').forEach(b=>b.addEventListener('click',ev=>{
+        const id=b.dataset.id; if(!confirm('Delete workout?')) return;
+        library=library.filter(x=>x.id!==id); for(const k of Object.keys(plan)){ plan[k]=plan[k].filter(x=>x!==id); if(!plan[k].length) delete plan[k]; }
+        save(); renderLib(document.getElementById('search').value); renderWeek();
+      }));
+    }
+
+    // render week
+    function renderWeek(){
+      weekGrid.innerHTML=''; weekLabel.textContent = formatRange(weekStart);
+      for(let i=0;i<7;i++){
+        const d=new Date(weekStart); d.setDate(d.getDate()+i);
+        const iso = d.toISOString().slice(0,10);
+        const div=document.createElement('div'); div.className='day'; div.dataset.iso=iso;
+        div.innerHTML=`<h3>${DAYS[d.getDay()]} <span class="tiny">${iso}</span></h3><div class="items" id="it-${iso}"></div>`;
+        div.addEventListener('dragover',e=>{ e.preventDefault(); div.style.outline='2px dashed rgba(255,255,255,0.04)' });
+        div.addEventListener('dragleave',()=>div.style.outline='none');
+        div.addEventListener('drop',e=>{ e.preventDefault(); div.style.outline='none'; const id=e.dataTransfer.getData('text/plain'); if(id) assign(id,iso) });
+        div.addEventListener('click',e=>{ if(e.target.tagName==='BUTTON') return; quickAdd(iso) });
+        weekGrid.appendChild(div);
+        renderDay(iso);
+      }
+      updateTotals();
+    }
+
+    function renderDay(iso){
+      const el=document.getElementById(`it-${iso}`); if(!el) return; el.innerHTML='';
+      const list=(plan[iso]||[]).map(id=>library.find(w=>w.id===id)).filter(Boolean);
+      if(!list.length){ el.innerHTML='<div class="tiny muted">No workouts</div>'; return; }
+      list.forEach(w=>{
+        const p=document.createElement('div'); p.className='plan';
+        p.innerHTML=`<div><div style="font-weight:700">${escapeHtml(w.name)}</div><div class="tiny">${w.category} · ${w.duration} min</div></div>
+          <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+            <div style="display:flex;gap:6px">
+              <button data-id="${w.id}" data-iso="${iso}" class="btn ghost small viewP">View</button>
+              <button data-id="${w.id}" data-iso="${iso}" class="btn ghost small remove">Remove</button>
+            </div>
+            <div class="tiny">${w.exercises.slice(0,2).join(' · ')}${w.exercises.length>2?'...':''}</div>
+          </div>`;
+        el.appendChild(p);
+      });
+
+      // attach remove/view
+      el.querySelectorAll('.remove').forEach(b=>b.addEventListener('click',ev=>{
+        const id=b.dataset.id, iso=b.dataset.iso;
+        plan[iso]=plan[iso].filter(x=>x!==id); if(!plan[iso].length) delete plan[iso]; save(); renderDay(iso); updateTotals();
+      }));
+      el.querySelectorAll('.viewP').forEach(b=>b.addEventListener('click',ev=>{
+        const w=library.find(x=>x.id===b.dataset.id); if(w) alert(format(w));
+      }));
+    }
+
+    // actions
+    function assign(id,iso){ if(!/^\d{4}-\d{2}-\d{2}$/.test(iso)){ alert('Invalid date'); return; } if(!plan[iso]) plan[iso]=[]; plan[iso].push(id); save(); renderDay(iso); updateTotals() }
+    function quickAdd(iso){
+      const name=prompt('Workout name'); if(!name) return;
+      const mins=prompt('Minutes','20'); const cat=prompt('Category','Cardio'); const exs=(prompt('Exercises (comma separated)','Run 20min')||'').split(',').map(s=>s.trim()).filter(Boolean);
+      const w=make(name,cat,Number(mins)||0,exs); library.unshift(w); assign(w.id,iso); save(); renderLib(document.getElementById('search').value); renderWeek();
+    }
+
+    // forms & UI
+    document.getElementById('form').addEventListener('submit',e=>{
+      e.preventDefault();
+      const name=document.getElementById('name').value.trim(); if(!name) return;
+      const mins=document.getElementById('minutes').value||0; const cat=document.getElementById('cat').value;
+      const exs=document.getElementById('exs').value.trim().split('\n').map(s=>s.trim()).filter(Boolean);
+      library.unshift(make(name,cat,Number(mins)||0,exs)); save(); renderLib(document.getElementById('search').value); e.target.reset();
+    });
+
+    document.getElementById('search').addEventListener('input',e=>renderLib(e.target.value));
+    document.getElementById('prev').addEventListener('click',()=>{ weekStart.setDate(weekStart.getDate()-7); save(); renderWeek() });
+    document.getElementById('next').addEventListener('click',()=>{ weekStart.setDate(weekStart.getDate()+7); save(); renderWeek() });
+    document.getElementById('clearWeek').addEventListener('click',()=>{
+      if(!confirm('Clear planned workouts for this week?')) return;
+      for(const iso of Object.keys(plan)){ const d=new Date(iso+'T00:00:00'); if(d>=weekStart && d<new Date(weekStart.getTime()+7*86400000)) delete plan[iso]; }
+      save(); renderWeek();
+    });
+    document.getElementById('clearLib').addEventListener('click',()=>{ if(!confirm('Clear library?')) return; library=[]; for(const k of Object.keys(plan)){ plan[k]=plan[k].filter(id=>library.find(w=>w.id===id)); if(!plan[k].length) delete plan[k]; } save(); renderLib(); renderWeek(); });
+    document.getElementById('reset').addEventListener('click',()=>{ if(!confirm('Reset everything?')) return; library=[]; plan={}; save(); renderLib(); renderWeek(); });
+    document.getElementById('timer').addEventListener('click',()=>{ const mins=Number(prompt('Timer minutes','10')); if(!mins||mins<=0) return; startTimer(mins*60); });
+
+    // export / import
+    document.getElementById('exportBtn').addEventListener('click',()=>{
+      const data = JSON.stringify({library,plan},null,2); const blob=new Blob([data],{type:'application/json'}); const url=URL.createObjectURL(blob);
+      const a=document.createElement('a'); a.href=url; a.download='workouts.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+    document.getElementById('importBtn').addEventListener('click',()=>document.getElementById('file').click());
+    document.getElementById('file').addEventListener('change',e=>{
+      const f=e.target.files[0]; if(!f) return;
+      const r=new FileReader(); r.onload=ev=>{
+        try{ const obj=JSON.parse(ev.target.result); if(Array.isArray(obj.library)) library=obj.library; if(obj.plan) plan=obj.plan; save(); renderLib(); renderWeek(); alert('Imported'); }catch(err){ alert('Invalid JSON') }
+      }; r.readAsText(f); e.target.value='';
+    });
+
+    // timer UI
+    function startTimer(seconds){
+      let rem=seconds; const overlay=document.createElement('div'); overlay.style.position='fixed'; overlay.style.inset=0; overlay.style.display='grid';
+      overlay.style.placeItems='center'; overlay.style.background='rgba(2,6,23,0.85)'; overlay.style.zIndex=9999;
+      overlay.innerHTML=`<div style="background:var(--card);padding:24px;border-radius:12px;text-align:center;min-width:220px">
+        <div id="cd" style="font-size:36px;font-weight:800">${fmt(rem)}</div><div style="margin-top:12px;display:flex;gap:8px;justify-content:center">
+        <button id="pause" class="btn ghost">Pause</button><button id="stop" class="btn ghost">Stop</button></div></div>`;
+      document.body.appendChild(overlay); let paused=false; const id=setInterval(()=>{ if(!paused){ rem--; document.getElementById('cd').textContent=fmt(rem); if(rem<=0){ clearInterval(id); alert('Done'); overlay.remove(); } } },1000);
+      overlay.querySelector('#pause').addEventListener('click',()=>{ paused=!paused; overlay.querySelector('#pause').textContent=paused?'Resume':'Pause'; });
+      overlay.querySelector('#stop').addEventListener('click',()=>{ if(confirm('Stop timer?')){ clearInterval(id); overlay.remove(); }});
+    }
+
+    // helpers
+    function updateTotals(){ let t=0; for(const iso of Object.keys(plan)){ for(const id of plan[iso]){ const w=library.find(x=>x.id===id); if(w&&w.duration) t+=Number(w.duration)||0 } } totalEl.textContent=t }
+    function renderAll(){ renderLib(); renderWeek(); }
+    function startOfWeek(d){ const x=new Date(d); x.setHours(0,0,0,0); const day=x.getDay(); x.setDate(x.getDate()-day); return x }
+    function formatRange(s){ const e=new Date(s); e.setDate(e.getDate()+6); return `${s.toLocaleDateString()} — ${e.toLocaleDateString()}` }
+    function fmt(sec){ const m=Math.floor(sec/60), s=sec%60; return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0') }
+    function escapeHtml(s){ return (s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) }
+    function format(w){ return `${w.name}\n\nCategory: ${w.category}\nDuration: ${w.duration} min\n\nExercises:\n- ${w.exercises.join('\n- ')}` }
+
+    // init
+    load(); renderAll();
+
+    // keyboard shortcut: N quick add for today
+    document.addEventListener('keydown',e=>{ if(e.key.toLowerCase()==='n' && document.activeElement.tagName!=='INPUT' && document.activeElement.tagName!=='TEXTAREA') quickAdd(new Date().toISOString().slice(0,10)) });
+
+    // storage sync
+    window.addEventListener('storage',e=>{ if(e.key===KEY){ load(); renderAll(); }});
+  </script>
+</body>
+</html>
